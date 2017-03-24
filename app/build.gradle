@@ -1,0 +1,71 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "test.gradle.flavors.testgradleflavors"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    flavorDimensions "partner", "brand", "backend"
+    productFlavors {
+        brandA {
+            dimension "brand"
+            applicationId "test.gradle.flavors.brandA"
+            versionCode 10
+        }
+        brandB {
+            dimension "brand"
+            applicationId "test.gradle.flavors.brandB"
+            versionCode 20
+
+        }
+        vanilla {
+            dimension "partner"
+        }
+        sony {
+            dimension "partner"
+            applicationId "test.gradle.flavors.sony"
+            versionCode 100
+        }
+        samsung {
+            dimension "partner"
+            applicationId "test.gradle.flavors.samsung"
+            versionCode 101
+        }
+        stage {
+            dimension "backend"
+        }
+        prod {
+            dimension "backend"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        println "before) ${variant.name}, pkg: ${variant.applicationId}, vc: ${variant.versionCode}"
+
+        // Hack to set correct applicationId according to flavor dimension priority.
+        variant.productFlavors.find {flavor ->
+            if (flavor.applicationId != null && !flavor.applicationId.empty) {
+                variant.mergedFlavor.applicationId = flavor.applicationId
+                return true
+            }
+            return false
+        }
+        println "after)  ${variant.name}, pkg: ${variant.applicationId}, vc: ${variant.versionCode}"
+    }
+}
+
+dependencies {
+}
